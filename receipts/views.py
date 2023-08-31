@@ -48,6 +48,23 @@ def create_category(request):
 
 
 @login_required
+def create_account(request):
+    if request.method == "POST":
+        form = AccountForm(request.POST)
+        if form.is_valid():
+            account = form.save(False)
+            account.owner = request.user
+            account.save()
+            return redirect("account_list")
+    else:
+        form = CategoryForm()
+    context = {
+        "form": form,
+    }
+    return render(request, "accounts/create.html", context)
+
+
+@login_required
 def category_list(request):
     categories = ExpenseCategory.objects.filter(owner=request.user)
     context = {
@@ -63,20 +80,3 @@ def account_list(request):
         "accounts": accounts,
     }
     return render(request, "accounts/list.html", context)
-
-
-@login_required
-def create_account(request):
-    if request.method == "POST":
-        form = AccountForm(request.POST)
-        if form.is_valid():
-            account = form.save(False)
-            account.owner = request.user
-            account.save()
-            return redirect("account_list")
-    else:
-        form = CategoryForm()
-    context = {
-        "form": form,
-    }
-    return render(request, "accounts/create.html", context)
